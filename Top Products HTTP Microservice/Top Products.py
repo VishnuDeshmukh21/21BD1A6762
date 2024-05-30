@@ -7,13 +7,16 @@ app = Flask(__name__)
 
 # Configuration and Global Variables
 BASE_URL = "http://20.244.56.144/test"
-PAGE_SIZE = 10
-access_token = None
+PAGE_SIZE = 10  # Number of products per page
+access_token = None  # Access token for authentication
 
 # Authentication Function
 def authenticate():
+    """
+    Authenticate with the server to obtain an access token.
+    """
     url = f"{BASE_URL}/auth"
-    payload ={
+    payload = {
     "companyName": "Keshav Memorial Institute of Technology",
     "clientID": "96ae1eb7-3426-44b1-951a-1ad027550dd2",
     "clientSecret": "FaTNMITkUABHAPaj",
@@ -26,6 +29,9 @@ def authenticate():
 
 # Fetch products from Test Server
 def fetch_products(company, category, top, minPrice, maxPrice):
+    """
+    Fetch products of a specific category and company from the server.
+    """
     url = f"{BASE_URL}/companies/{company}/categories/{category}/products"
     params = {
         "top": top,
@@ -35,7 +41,7 @@ def fetch_products(company, category, top, minPrice, maxPrice):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    retries = 3
+    retries = 3  # Number of retries in case of connection timeout
     for _ in range(retries):
         try:
             response = requests.get(url, params=params, headers=headers, timeout=0.5)
@@ -50,11 +56,17 @@ def fetch_products(company, category, top, minPrice, maxPrice):
 
 # Generate unique product ID
 def generate_product_id(product):
+    """
+    Generate a unique ID for a product using its name, price, and rating.
+    """
     product_string = f"{product['productName']}-{product['price']}-{product['rating']}"
     return hashlib.md5(product_string.encode()).hexdigest()
 
 @app.route('/categories/<string:categoryname>/products', methods=['GET'])
 def get_products(categoryname):
+    """
+    API endpoint to get products of a specified category with pagination.
+    """
     top = int(request.args.get('top', 10))
     page = int(request.args.get('page', 1))
     minPrice = int(request.args.get('minPrice', 0))
@@ -92,6 +104,9 @@ def get_products(categoryname):
 
 @app.route('/categories/<string:categoryname>/products/<string:productid>', methods=['GET'])
 def get_product_details(categoryname, productid):
+    """
+    API endpoint to get details of a specific product by its ID.
+    """
     companies = ["AMZ", "FLP", "SNP", "MYN", "AZO"]
     for company in companies:
         products = fetch_products(company, categoryname, 100, 0, float('inf'))

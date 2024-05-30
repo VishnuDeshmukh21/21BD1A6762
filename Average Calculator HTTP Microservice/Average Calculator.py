@@ -6,6 +6,7 @@ from requests.exceptions import ConnectTimeout, RequestException
 app = Flask(__name__)
 
 # Configuration and Global Variables
+ACCESS_CODE = "YourAccessCode"
 BASE_URL = "http://20.244.56.144/test"
 WINDOW_SIZE = 10
 window = []  # Current sliding window
