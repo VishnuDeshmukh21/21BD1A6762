@@ -8,12 +8,15 @@ app = Flask(__name__)
 # Configuration and Global Variables
 BASE_URL = "http://20.244.56.144/test"
 WINDOW_SIZE = 10
-window = []
-prev_window = []
-access_token = None
+window = []  # Current sliding window
+prev_window = []  # Previous state of the sliding window
+access_token = None  # Access token for authentication
 
 # Authentication Function
 def authenticate():
+    """
+    Authenticate with the server to obtain an access token.
+    """
     url = f"{BASE_URL}/auth"
     payload = {
     "companyName": "Keshav Memorial Institute of Technology",
@@ -28,11 +31,14 @@ def authenticate():
 
 # Fetch numbers from Test Server
 def fetch_numbers(type):
+    """
+    Fetch numbers of a specific type from the server.
+    """
     url = f"{BASE_URL}/{type}"
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    retries = 3
+    retries = 3  # Number of retries in case of connection timeout
     for _ in range(retries):
         try:
             response = requests.get(url, headers=headers, timeout=0.5)
@@ -47,12 +53,19 @@ def fetch_numbers(type):
 
 # Calculate average
 def calculate_average(numbers):
+    """
+    Calculate the average of a list of numbers.
+    """
     return sum(numbers) / len(numbers) if numbers else 0
 
 @app.route('/numbers/<string:numberid>', methods=['GET'])
 def get_numbers(numberid):
+    """
+    API endpoint to get numbers of a specified type and calculate their average.
+    """
     global window, prev_window
     
+    # Mapping of number types to their corresponding endpoints
     type_mapping = {
         'p': 'primes',
         'f': 'fibo',
@@ -67,13 +80,13 @@ def get_numbers(numberid):
     if not numbers:
         return jsonify({"error": "Failed to fetch numbers"}), 500
     
-    prev_window = window.copy()
+    prev_window = window.copy()  # Save current state of the window
     
     # Maintain unique numbers and sliding window of size WINDOW_SIZE
     for num in numbers:
         if num not in window:
             if len(window) >= WINDOW_SIZE:
-                window.pop(0)
+                window.pop(0)  # Remove the oldest number if window is full
             window.append(num)
     
     avg = calculate_average(window)
