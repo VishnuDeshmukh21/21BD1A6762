@@ -5,8 +5,7 @@ This microservice retrieves top products from multiple e-commerce companies and 
 ### How to Run
 
 1. Ensure you have Python installed on your system.
-2. Install the required dependencies using `pip install -r requirements.txt`.
-3. Run the microservice using the command `python Top Products.py`.
+2. Run the microservice using the command `python Top Products.py`.
 
 ### Usage
 
